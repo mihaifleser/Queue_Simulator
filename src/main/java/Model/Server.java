@@ -10,15 +10,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server implements Runnable{
     private BlockingQueue<Task> tasks;
     private AtomicInteger waitingPeriod;
-
+    private AtomicInteger stopThread;
     public Server()
     {
         tasks = new LinkedBlockingQueue<Task>();
         waitingPeriod = new AtomicInteger(0);
+        stopThread = new AtomicInteger(0);
     }
     public int getWaitingPeriod()
     {
         return waitingPeriod.get();
+    }
+
+    public void stopThread()
+    {
+        stopThread.set(1);
     }
 
     public LinkedBlockingQueue getTasks()
@@ -33,7 +39,7 @@ public class Server implements Runnable{
     }
     @Override
     public void run() {
-        while(true)
+        while(stopThread.get() == 0)
         {
             try {
                 Task currentTask;

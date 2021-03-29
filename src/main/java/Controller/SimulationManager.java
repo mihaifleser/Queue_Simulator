@@ -2,6 +2,9 @@ package Controller;
 
 import Model.Task;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,38 +51,61 @@ public class SimulationManager implements Runnable{
         }
     }
 
+    public void writeOutput(int currentTime)
+    {
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter("output.txt", true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        PrintWriter printWriter = new PrintWriter(fileWriter);
 
-
+        System.out.println("Time " + currentTime);
+        printWriter.println("Time " + currentTime);
+        System.out.print("Waiting clients: ");
+        printWriter.print("Waiting clients: ");
+        for (Task t:generatedTasks)
+        {
+            System.out.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
+            printWriter.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
+        }
+        System.out.println();
+        printWriter.println();
+        for(int j = 1; j<= numberOfServers; j++)
+        {
+            System.out.print("QUEUE " + j + ": ");
+            System.out.println(scheduler.getServers().get(j - 1).writeElementsInServer());
+            printWriter.print("QUEUE " + j + ": ");
+            printWriter.println(scheduler.getServers().get(j - 1).writeElementsInServer());
+        }
+        System.out.println();
+        printWriter.println();
+        printWriter.close();
+    }
 
 
     @Override
     public void run() {
-        for(int i = 0; i < timeLimit; i++)
+        int currentTime = 0;
+        while (currentTime < timeLimit && (generatedTasks.size() > 0 || scheduler.areTasksInServers()) )
         {
 
-            while(generatedTasks.size() > 0 && generatedTasks.get(0).getArrivalTime() == i)
+            while(generatedTasks.size() > 0 && generatedTasks.get(0).getArrivalTime() == currentTime)
             {
                 Task task = generatedTasks.remove(0);
                 scheduler.dispachTask(task);
             }
-            System.out.println("Time " + i);
-            System.out.print("Waiting clients: ");
-            for (Task t:generatedTasks)
-            {
-                System.out.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
-            }
-            System.out.println();
-            for(int j = 1; j<= numberOfServers; j++)
-            {
-                System.out.print("QUEUE " + j + ": ");
-                System.out.println(scheduler.getServers().get(j - 1).writeElementsInServer());
-            }
-            System.out.println();
+
+            writeOutput(currentTime);
+            currentTime++;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        writeOutput(currentTime);
+        scheduler.stopServers();
     }
 }

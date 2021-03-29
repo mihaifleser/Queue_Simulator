@@ -41,6 +41,23 @@ public class Scheduler {
         minServer.addTask(newTask);
     }
 
+    public void stopServers()
+    {
+        for(Server server:servers)
+        {
+            server.stopThread();
+        }
+    }
+
+    public boolean areTasksInServers()
+    {
+        for(Server server:servers)
+            if(server.getTasks().size() > 0)
+                return true;
+
+        return false;
+    }
+
     public List<Server> getServers()
     {
         return servers;
