@@ -21,6 +21,11 @@ public class Server implements Runnable{
         return waitingPeriod.get();
     }
 
+    public LinkedBlockingQueue getTasks()
+    {
+        return new LinkedBlockingQueue(tasks);
+    }
+
     public void addTask(Task newTask)
     {
         tasks.add(newTask);
@@ -36,11 +41,20 @@ public class Server implements Runnable{
                 {
                     Thread.sleep(tasks.peek().getProcessingTime() * 1000);
                     currentTask = tasks.poll();
-                    waitingPeriod.set(waitingPeriod.get() + currentTask.getProcessingTime());
+                    waitingPeriod.set(waitingPeriod.get() - currentTask.getProcessingTime());
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public String writeElementsInServer()
+    {
+        String result = "";
+        for (Task t:tasks) {
+            result = result + "( "+ t.getId() + " " + t.getArrivalTime() + " " + t.getProcessingTime() + ") ";
+        }
+        return result;
     }
 }

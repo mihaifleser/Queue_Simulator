@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Task;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +21,7 @@ public class SimulationManager implements Runnable{
 
     public SimulationManager(int timeLimit, int maxProcessingTime, int minProcessingTime, int numberOfServers, int numberOfTasks, int minArrivalTime, int maxArrivalTime)
     {
+        generatedTasks = new ArrayList<Task>();
         this.timeLimit = timeLimit;
         this.maxProcessingTime = maxProcessingTime;
         this.minProcessingTime = minProcessingTime;
@@ -41,7 +43,7 @@ public class SimulationManager implements Runnable{
             Random random = new Random();
             randomArrival = random.nextInt(maxArrivalTime - minArrivalTime) + minArrivalTime;
             randomProcessing = random.nextInt(maxProcessingTime - minProcessingTime) + minProcessingTime;
-            Task task = new Task(0,randomArrival,randomProcessing);
+            Task task = new Task(i,randomArrival,randomProcessing);
             generatedTasks.add(task);
         }
     }
@@ -52,6 +54,32 @@ public class SimulationManager implements Runnable{
 
     @Override
     public void run() {
+        for(int i = 0; i < timeLimit; i++)
+        {
 
+            while(generatedTasks.size() > 0 && generatedTasks.get(0).getArrivalTime() == i)
+            {
+                Task task = generatedTasks.remove(0);
+                scheduler.dispachTask(task);
+            }
+            System.out.println("Time " + i);
+            System.out.print("Waiting clients: ");
+            for (Task t:generatedTasks)
+            {
+                System.out.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
+            }
+            System.out.println();
+            for(int j = 1; j<= numberOfServers; j++)
+            {
+                System.out.print("QUEUE " + j + ": ");
+                System.out.println(scheduler.getServers().get(j - 1).writeElementsInServer());
+            }
+            System.out.println();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

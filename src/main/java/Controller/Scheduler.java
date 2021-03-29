@@ -2,19 +2,19 @@ package Controller;
 
 import Model.Server;
 import Model.Task;
-import org.codehaus.plexus.classworlds.strategy.Strategy;
-import sun.util.resources.Bundles;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Scheduler {
     private List<Server> servers;
     private int maxNoServers;
     private int maxTasksPerServer;
-    private Strategy strategy;
 
     public Scheduler(int maxNoServers, int maxTasksPerServer)
     {
+        servers = new ArrayList<Server>();
         this.maxNoServers = maxNoServers;
         this.maxTasksPerServer = maxTasksPerServer;
         for(int i = 0; i < maxNoServers; i++)
