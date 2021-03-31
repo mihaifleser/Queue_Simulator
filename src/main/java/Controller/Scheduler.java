@@ -35,6 +35,16 @@ public class Scheduler {
         return minServer;
     }
 
+    public int getClientsInServers()
+    {
+        int nrOfClients = 0;
+        for(Server server: servers)
+        {
+            nrOfClients += server.getNumberOfTasks();
+        }
+        return nrOfClients;
+    }
+
     public void dispachTask(Task newTask)
     {
         Server minServer = getServerWithMinimumWaitingTime();

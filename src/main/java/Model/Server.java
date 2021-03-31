@@ -31,6 +31,10 @@ public class Server implements Runnable{
     {
         return new LinkedBlockingQueue(tasks);
     }
+    public int getNumberOfTasks()
+    {
+        return tasks.size();
+    }
 
     public void addTask(Task newTask)
     {

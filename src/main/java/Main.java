@@ -5,8 +5,8 @@ public class Main {
     {
         //System.out.println("TEST");
         int timeLimit = 60;
-        int maxProcessingTime = 4;
-        int minProcessingTime = 2;
+        int maxProcessingTime = 5;
+        int minProcessingTime = 1;
         int maxArrivalTime = 30;
         int minArrivalTime = 2;
         int numberOfServers = 4;
