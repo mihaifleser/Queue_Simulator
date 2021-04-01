@@ -45,6 +45,16 @@ public class Scheduler {
         return nrOfClients;
     }
 
+    public int getTotalWaitingAtQueues()
+    {
+        int result = 0;
+        for(Server server : servers)
+        {
+            result += server.getTotalWaitingInQueues();
+        }
+        return result;
+    }
+
     public void dispachTask(Task newTask)
     {
         Server minServer = getServerWithMinimumWaitingTime();
@@ -57,15 +67,6 @@ public class Scheduler {
         {
             server.stopThread();
         }
-    }
-
-    public boolean areTasksInServers()
-    {
-        for(Server server:servers)
-            if(server.getTasks().size() > 0)
-                return true;
-
-        return false;
     }
 
     public List<Server> getServers()

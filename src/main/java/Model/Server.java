@@ -11,10 +11,12 @@ public class Server implements Runnable{
     private BlockingQueue<Task> tasks;
     private AtomicInteger waitingPeriod;
     private AtomicInteger stopThread;
+    private AtomicInteger totalWaitingInQueue;
     public Server()
     {
         tasks = new LinkedBlockingQueue<Task>();
         waitingPeriod = new AtomicInteger(0);
+        totalWaitingInQueue = new AtomicInteger(0);
         stopThread = new AtomicInteger(0);
     }
     public int getWaitingPeriod()
@@ -52,11 +54,21 @@ public class Server implements Runnable{
                     Thread.sleep(tasks.peek().getProcessingTime() * 1000);
                     currentTask = tasks.poll();
                     waitingPeriod.set(waitingPeriod.get() - currentTask.getProcessingTime());
+                    for(Task t:tasks)
+                    {
+                        t.increaseWaitingTime(currentTask.getProcessingTime());
+                    }
+                    totalWaitingInQueue.set(totalWaitingInQueue.get() + currentTask.getWaitingTime());
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public int getTotalWaitingInQueues()
+    {
+        return totalWaitingInQueue.get();
     }
 
     public String writeElementsInServer()

@@ -13,7 +13,7 @@ import java.util.Random;
 public class SimulationManager implements Runnable{
     private int peakHour;
     private int maxClientsInQueues;
-    private int avarageWaitingTime;
+    private float avarageWaitingTime;
     private int timeLimit;
     private int maxProcessingTime;
     private int minProcessingTime;
@@ -96,6 +96,8 @@ public class SimulationManager implements Runnable{
             printWriter.println("Avarage Service Time: " + avarageServiceTime);
             System.out.println("Peak Hour: " + peakHour);
             printWriter.println("Peak Hour: " + peakHour);
+            System.out.println("Average Waiting Time: " + avarageWaitingTime);
+            printWriter.println("Average Waiting Time: " + avarageWaitingTime);
         }
 
         printWriter.close();
@@ -107,7 +109,7 @@ public class SimulationManager implements Runnable{
 
         int currentTime = 0;
         int currentClientsInQueues;
-        while (currentTime < timeLimit && (generatedTasks.size() > 0 || scheduler.areTasksInServers()) )
+        while (currentTime < timeLimit && (generatedTasks.size() > 0 || scheduler.getClientsInServers() > 0) )
         {
 
             while(generatedTasks.size() > 0 && generatedTasks.get(0).getArrivalTime() == currentTime)
@@ -131,6 +133,8 @@ public class SimulationManager implements Runnable{
                 e.printStackTrace();
             }
         }
+        avarageWaitingTime = scheduler.getTotalWaitingAtQueues() / (float)(numberOfTasks - generatedTasks.size() - scheduler.getClientsInServers());
+        //System.out.println("AAAAAAAAAA " + scheduler.getTotalWaitingAtQueues());
         writeOutput(currentTime,true);
         scheduler.stopServers();
     }

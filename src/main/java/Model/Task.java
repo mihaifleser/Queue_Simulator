@@ -6,15 +6,27 @@ public class Task{
     private int id;
     private int arrivalTime;
     private int processingTime;
+    private int waitingTime;
 
     public Task(int id, int arrivalTime, int processingTime)
     {
+        waitingTime = 0;
         this.id = id;
         this.arrivalTime = arrivalTime;
         this.processingTime = processingTime;
     }
     public int getId() {
         return id;
+    }
+
+    public int getWaitingTime()
+    {
+        return waitingTime;
+    }
+
+    public void increaseWaitingTime(int amount)
+    {
+        waitingTime += amount;
     }
 
     public int getArrivalTime() {
@@ -31,8 +43,10 @@ public class Task{
             //ascending order
             if(t1.getArrivalTime() > t2.getArrivalTime())
                 return 1;
-            else
-                return -1;
+            else if (t1.getArrivalTime() == t2.getArrivalTime())
+                        return 0;
+                else
+                    return -1;
 
         }};
 
