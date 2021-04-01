@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Task;
 
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class SimulationManager implements Runnable{
+    private String file;
     private int peakHour;
     private int maxClientsInQueues;
     private float avarageWaitingTime;
@@ -28,6 +30,7 @@ public class SimulationManager implements Runnable{
 
     public SimulationManager(int timeLimit, int maxProcessingTime, int minProcessingTime, int numberOfServers, int numberOfTasks, int minArrivalTime, int maxArrivalTime)
     {
+        file = "output.txt";
         avarageServiceTime = 0;
         maxClientsInQueues = 0;
         peakHour = 0;
@@ -64,7 +67,7 @@ public class SimulationManager implements Runnable{
     {
         FileWriter fileWriter = null;
         try {
-            fileWriter = new FileWriter("output.txt", true);
+            fileWriter = new FileWriter(file, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,7 +109,14 @@ public class SimulationManager implements Runnable{
 
     @Override
     public void run() {
-
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        writer.print("");
+        writer.close();
         int currentTime = 0;
         int currentClientsInQueues;
         while (currentTime < timeLimit && (generatedTasks.size() > 0 || scheduler.getClientsInServers() > 0) )
