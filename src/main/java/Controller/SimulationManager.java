@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.Task;
+import View.GUI;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 public class SimulationManager implements Runnable{
+    private GUI gui;
     private String file;
     private int peakHour;
     private int maxClientsInQueues;
@@ -25,11 +27,14 @@ public class SimulationManager implements Runnable{
     private int numberOfTasks;
     private float avarageServiceTime;
 
+    private int stop;
     private Scheduler scheduler;
     private List<Task> generatedTasks;
 
-    public SimulationManager(int timeLimit, int maxProcessingTime, int minProcessingTime, int numberOfServers, int numberOfTasks, int minArrivalTime, int maxArrivalTime)
+    public SimulationManager(GUI gui, int timeLimit, int maxProcessingTime, int minProcessingTime, int numberOfServers, int numberOfTasks, int minArrivalTime, int maxArrivalTime)
     {
+        this.stop = 0;
+        this.gui = gui;
         file = "output.txt";
         avarageServiceTime = 0;
         maxClientsInQueues = 0;
@@ -45,6 +50,17 @@ public class SimulationManager implements Runnable{
         scheduler = new Scheduler(numberOfServers,numberOfTasks);
         generateNRandomTasks();
         Collections.sort(generatedTasks, Task.monomialComparator);
+    }
+
+    public void setParameters(int timeLimit, int maxProcessingTime, int minProcessingTime, int numberOfServers, int numberOfTasks, int minArrivalTime, int maxArrivalTime)
+    {
+        this.timeLimit = timeLimit;
+        this.maxProcessingTime = maxProcessingTime;
+        this.minProcessingTime = minProcessingTime;
+        this.maxArrivalTime = maxArrivalTime;
+        this.minArrivalTime = minArrivalTime;
+        this.numberOfServers = numberOfServers;
+        this.numberOfTasks = numberOfTasks;
     }
 
     private void generateNRandomTasks()
@@ -63,6 +79,11 @@ public class SimulationManager implements Runnable{
         avarageServiceTime = avarageServiceTime/ numberOfTasks;
     }
 
+    public void setStop(int stop)
+    {
+        this.stop = 1;
+    }
+
     public void writeOutput(int currentTime, boolean lastTime)
     {
         FileWriter fileWriter = null;
@@ -75,32 +96,43 @@ public class SimulationManager implements Runnable{
 
         System.out.println("Time " + currentTime);
         printWriter.println("Time " + currentTime);
+        gui.addTextOnConsole("Time " + currentTime + "\n");
         System.out.print("Waiting clients: ");
         printWriter.print("Waiting clients: ");
+        gui.addTextOnConsole("Waiting clients: ");
         for (Task t:generatedTasks)
         {
             System.out.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
             printWriter.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
+            gui.addTextOnConsole("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
         }
         System.out.println();
         printWriter.println();
+        gui.addTextOnConsole("\n");
+
         for(int j = 1; j<= numberOfServers; j++)
         {
             System.out.print("QUEUE " + j + ": ");
             System.out.println(scheduler.getServers().get(j - 1).writeElementsInServer());
             printWriter.print("QUEUE " + j + ": ");
             printWriter.println(scheduler.getServers().get(j - 1).writeElementsInServer());
+            gui.addTextOnConsole("QUEUE " + j + ": ");
+            gui.addTextOnConsole(scheduler.getServers().get(j - 1).writeElementsInServer() + "\n");
         }
         System.out.println();
         printWriter.println();
+        gui.addTextOnConsole("\n");
         if(lastTime)
         {
             System.out.println("Avarage Service Time: " + avarageServiceTime);
             printWriter.println("Avarage Service Time: " + avarageServiceTime);
+            gui.addTextOnConsole("Avarage Service Time: " + avarageServiceTime + "\n");
             System.out.println("Peak Hour: " + peakHour);
             printWriter.println("Peak Hour: " + peakHour);
+            gui.addTextOnConsole("Peak Hour: " + peakHour + "\n");
             System.out.println("Average Waiting Time: " + avarageWaitingTime);
             printWriter.println("Average Waiting Time: " + avarageWaitingTime);
+            gui.addTextOnConsole("Average Waiting Time: " + avarageWaitingTime + "\n");
         }
 
         printWriter.close();
@@ -119,7 +151,7 @@ public class SimulationManager implements Runnable{
         writer.close();
         int currentTime = 0;
         int currentClientsInQueues;
-        while (currentTime < timeLimit && (generatedTasks.size() > 0 || scheduler.getClientsInServers() > 0) )
+        while (currentTime < timeLimit && (generatedTasks.size() > 0 || scheduler.getClientsInServers() > 0)  && stop == 0)
         {
 
             while(generatedTasks.size() > 0 && generatedTasks.get(0).getArrivalTime() == currentTime)
@@ -143,9 +175,12 @@ public class SimulationManager implements Runnable{
                 e.printStackTrace();
             }
         }
-        avarageWaitingTime = scheduler.getTotalWaitingAtQueues() / (float)(numberOfTasks - generatedTasks.size() - scheduler.getClientsInServers());
-        //System.out.println("AAAAAAAAAA " + scheduler.getTotalWaitingAtQueues());
-        writeOutput(currentTime,true);
+        if(stop == 0)
+        {
+            avarageWaitingTime = scheduler.getTotalWaitingAtQueues() / (float)(numberOfTasks - generatedTasks.size() - scheduler.getClientsInServers());
+            //System.out.println("AAAAAAAAAA " + scheduler.getTotalWaitingAtQueues());
+            writeOutput(currentTime,true);
+        }
         scheduler.stopServers();
     }
 }
