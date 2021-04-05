@@ -51,18 +51,6 @@ public class SimulationManager implements Runnable{
         generateNRandomTasks();
         Collections.sort(generatedTasks, Task.monomialComparator);
     }
-
-    public void setParameters(int timeLimit, int maxProcessingTime, int minProcessingTime, int numberOfServers, int numberOfTasks, int minArrivalTime, int maxArrivalTime)
-    {
-        this.timeLimit = timeLimit;
-        this.maxProcessingTime = maxProcessingTime;
-        this.minProcessingTime = minProcessingTime;
-        this.maxArrivalTime = maxArrivalTime;
-        this.minArrivalTime = minArrivalTime;
-        this.numberOfServers = numberOfServers;
-        this.numberOfTasks = numberOfTasks;
-    }
-
     private void generateNRandomTasks()
     {
         for(int i = 0 ; i < numberOfTasks; i++)
@@ -94,43 +82,43 @@ public class SimulationManager implements Runnable{
         }
         PrintWriter printWriter = new PrintWriter(fileWriter);
 
-        System.out.println("Time " + currentTime);
+        //System.out.println("Time " + currentTime);
         printWriter.println("Time " + currentTime);
         gui.addTextOnConsole("Time " + currentTime + "\n");
-        System.out.print("Waiting clients: ");
+        //System.out.print("Waiting clients: ");
         printWriter.print("Waiting clients: ");
         gui.addTextOnConsole("Waiting clients: ");
         for (Task t:generatedTasks)
         {
-            System.out.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
+            //System.out.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
             printWriter.print("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
             gui.addTextOnConsole("(" + t.getId() + " " + t.getArrivalTime() +" "+t.getProcessingTime() + ") ");
         }
-        System.out.println();
+        //System.out.println();
         printWriter.println();
         gui.addTextOnConsole("\n");
 
         for(int j = 1; j<= numberOfServers; j++)
         {
-            System.out.print("QUEUE " + j + ": ");
-            System.out.println(scheduler.getServers().get(j - 1).writeElementsInServer());
+            //System.out.print("QUEUE " + j + ": ");
+            //System.out.println(scheduler.getServers().get(j - 1).writeElementsInServer());
             printWriter.print("QUEUE " + j + ": ");
             printWriter.println(scheduler.getServers().get(j - 1).writeElementsInServer());
             gui.addTextOnConsole("QUEUE " + j + ": ");
             gui.addTextOnConsole(scheduler.getServers().get(j - 1).writeElementsInServer() + "\n");
         }
-        System.out.println();
+        //System.out.println();
         printWriter.println();
         gui.addTextOnConsole("\n");
         if(lastTime)
         {
-            System.out.println("Avarage Service Time: " + avarageServiceTime);
+            //System.out.println("Avarage Service Time: " + avarageServiceTime);
             printWriter.println("Avarage Service Time: " + avarageServiceTime);
             gui.addTextOnConsole("Avarage Service Time: " + avarageServiceTime + "\n");
-            System.out.println("Peak Hour: " + peakHour);
+            //System.out.println("Peak Hour: " + peakHour);
             printWriter.println("Peak Hour: " + peakHour);
             gui.addTextOnConsole("Peak Hour: " + peakHour + "\n");
-            System.out.println("Average Waiting Time: " + avarageWaitingTime);
+            //System.out.println("Average Waiting Time: " + avarageWaitingTime);
             printWriter.println("Average Waiting Time: " + avarageWaitingTime);
             gui.addTextOnConsole("Average Waiting Time: " + avarageWaitingTime + "\n");
         }

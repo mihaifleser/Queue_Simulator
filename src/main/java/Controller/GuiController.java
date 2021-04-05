@@ -35,6 +35,7 @@ public class GuiController {
                     thread.start();
                 } catch (Exception exception)
                 {
+                    simulationManager.setStop(1);
                     gui.addTextOnConsole("Error: can't parse one of the number\n");
                 }
 
